@@ -1,0 +1,18 @@
+{
+  "name": "houston-article-scraper",
+  "version": "1.0.0",
+  "description": "Small scraper that grabs one article from a Houston news site and saves it to the articles/ folder",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "run": "node runner.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "node-fetch": "^2.6.7",
+    "mongodb": "^4.9.1"
+  }
+}

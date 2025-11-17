@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>About — {BLOGNAME}</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta name="description" content="About {BLOGNAME} — a brief overview of the site, mission and contact placeholder.">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-left">
+    <a href="/" class="home-link">
+      <img src="img/icoW.png" alt="{BLOGNAME} logo" class="logo">
+      <h2 class="site-title">{BLOGNAME}</h2>
+    </a>
+  </div>
+  <div class="header-right">
+    <a href="/about.html" class="cta-link" aria-label="About">
+      <button class="btn">About</button>
+    </a>
+    <form class="search-form" action="/search.html" method="get" role="search">
+      <label for="q" class="visually-hidden">Search articles</label>
+      <input id="q" name="q" type="search" placeholder="Search articles" aria-label="Search articles">
+      <button type="submit" aria-label="Submit search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
+    </form>
+    <button class="hamburger" aria-label="Open menu" aria-controls="drawer" aria-expanded="false" title="Open menu"><span class="bar"></span></button>
+  </div>
+</header>
+
+<div class="backdrop" aria-hidden="true"></div>
+
+<main class="hero-container">
+  <div class="hero-body">
+    <article class="article-section" style="max-width:760px;margin:24px auto;padding:18px;background:#fff;border-radius:10px;">
+      <h1>About {BLOGNAME}</h1>
+      <p style="color:#333;line-height:1.5;margin-top:12px;">{BLOGABOUT}</p>
+      <p style="margin-top:16px;"><a href="/" class="btn" style="text-decoration:none;display:inline-block;padding:8px 12px;border-radius:8px;background:var(--bg);color:#fff;">Return home</a></p>
+    </article>
+  </div>
+  <div class="hero-side" id="drawer" role="dialog" aria-modal="true" aria-hidden="true">
+    <button class="drawer-close" aria-label="Close menu">×</button>
+    <iframe src="weather.html" title="{BLOGNAME} Weather" style="width:100%;min-width:320px;height:100vh;border:none;background:transparent;" loading="lazy"></iframe>
+</script>
+<script>
+// Timer and weather functionality (same approach used on other pages)
+(function(){
+  // Timer
+  function updateTimer() {
+    const timerElement = document.getElementById('timer');
+    if (!timerElement) return;
+    const now = new Date();
+    const options = { timeZone: 'America/Chicago', hour: '2-digit', minute: '2-digit', hour12: true };
+    const timeString = new Intl.DateTimeFormat('en-US', options).format(now);
+    timerElement.textContent = timeString;
+  }
+  setInterval(updateTimer, 1000);
+  updateTimer();
+
+  // zip to lat/lon map
+  const zipToLatLon = {
+    '77002': { lat: 29.752552016514958, lon: -95.37041452085252 },
+    '77006': { lat: 29.743058828618043, lon: -95.38872535855693 },
+    '77380': { lat: 30.156561330335677, lon: -95.49660348630132 },
+    '77373': { lat: 30.060076989444728, lon: -95.38425991103118 },
+    '77339': { lat: 30.044222740754748, lon: -95.21623381365497 },
+    '77024': { lat: 29.785061559286614, lon: -95.55081109649475 },
+    '77493': { lat: 29.86892877253447, lon: -95.83598143772524 },
+    '77584': { lat: 29.530560656795313, lon: -95.32129891012985 },
+    '77478': { lat: 29.619364025666467, lon: -95.60777755914671 },
+    '77502': { lat: 29.68279320790105, lon: -95.2012332550293 },
+    '77520': { lat: 29.729931184106412, lon: -94.98634034561468 },
+    '77338': { lat: 29.936252806244546, lon: -95.22575025287787 },
+    '77550': { lat: 29.3056910729656, lon: -94.79363293237242 },
+    '77571': { lat: 29.681951027430866, lon: -95.0504713333233 },
+    '77301': { lat: 30.372421017538844, lon: -95.45451089868827 },
+    '77375': { lat: 30.11186355029859, lon: -95.58409952099358 },
+    '77429': { lat: 30.014649608810636, lon: -95.66645508653544 },
+    '77459': { lat: 29.478751988175286, lon: -95.52957848248982 },
+    '77477': { lat: 29.622026902031646, lon: -95.56770250882548 },
+    '77586': { lat: 29.583383471744852, lon: -95.0348656373267 },
+    '77573': { lat: 29.495046460629094, lon: -95.09075177952913 },
+    '77336': { lat: 30.074194329781477, lon: -95.09146031763426 },
+    '77346': { lat: 29.998823130908438, lon: -95.17521190149226 },
+    '77077': { lat: 29.748046372801, lon: -95.62195225406828 },
+    '77530': { lat: 29.79477265921269, lon: -95.1119367314215 }
+  };
+
+  async function fetchWeatherNWS(lat, lon){
+    const url = `https://api.weather.gov/points/${lat},${lon}`;
+    try{
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('points fetch failed');
+      const data = await res.json();
+      const hourlyUrl = data.properties && data.properties.forecastHourly;
+      if(!hourlyUrl) throw new Error('hourly URL missing');
+      const hr = await fetch(hourlyUrl);
+      if(!hr.ok) throw new Error('hourly fetch failed');
+      const hrJson = await hr.json();
+      const now = new Date();
+      const current = hrJson.properties && hrJson.properties.periods && hrJson.properties.periods.find(p=>{ const s=new Date(p.startTime); const e=new Date(p.endTime); return now>=s && now<=e; });
+      if(current) return { temperature: current.temperature, shortForecast: current.shortForecast };
+      return null;
+    }catch(e){ console.error('weather error', e); return null; }
+  }
+
+  function pickIconClassForCondition(cond){
+    if(!cond) return 'fa-solid fa-sun';
+    const c = cond.toLowerCase();
+    if(c.includes('thunder')||c.includes('storm')||c.includes('tstm')) return 'fa-solid fa-bolt';
+    if(c.includes('rain')||c.includes('showers')) return 'fa-solid fa-cloud-showers-heavy';
+    if(c.includes('snow')||c.includes('sleet')||c.includes('flurr')) return 'fa-solid fa-snowflake';
+    if(c.includes('tornado')) return 'fa-solid fa-tornado';
+    if(c.includes('hurricane')||c.includes('tropical')) return 'fa-solid fa-hurricane';
+    if(c.includes('cloud')||c.includes('overcast')) return 'fa-solid fa-cloud';
+    if(c.includes('wind')||c.includes('breezy')) return 'fa-solid fa-wind';
+    if(c.includes('sun')||c.includes('clear')) return 'fa-solid fa-sun';
+    return 'fa-solid fa-sun';
+  }
+
+  function applyWeatherIcon(h2el, cond){
+    if(!h2el) return;
+    let icon = h2el.querySelector('i.weather-icon');
+    if(!icon){ icon = document.createElement('i'); icon.className = 'weather-icon'; icon.setAttribute('aria-hidden','true'); icon.style.marginLeft = '8px'; h2el.appendChild(icon); }
+    const cls = pickIconClassForCondition(cond);
+    icon.className = cls + ' weather-icon';
+    icon.style.color = 'currentColor';
+  }
+
+  function applyTempClass(el, temp){
+    if(!el) return;
+    el.classList.remove('temp-90','temp-80','temp-70','temp-60','temp-50','temp-40','temp-30','temp-29');
+    const t = Number(temp);
+    if(Number.isNaN(t)) return;
+    if(t >= 90) el.classList.add('temp-90');
+    else if(t >= 80) el.classList.add('temp-80');
+    else if(t >= 70) el.classList.add('temp-70');
+    else if(t >= 60) el.classList.add('temp-60');
+    else if(t >= 50) el.classList.add('temp-50');
+    else if(t >= 40) el.classList.add('temp-40');
+    else if(t >= 30) el.classList.add('temp-30');
+    else el.classList.add('temp-29');
+  }
+
+  async function updateWeather(){
+    for(const [zip, {lat, lon}] of Object.entries(zipToLatLon)){
+      const weather = await fetchWeatherNWS(lat, lon);
+      const el = document.getElementById(zip);
+      if(el && weather){ el.textContent = `${weather.temperature}°F`; applyTempClass(el, weather.temperature); applyWeatherIcon(el, weather.shortForecast); }
+    }
+  }
+
+  // start
+  updateWeather();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+#########################################################################################################
+
+DEV NOTES:
+
+Affected files:
+    Profile Section:
+        Slugs:
+        {BLOGURL}
+        {BLOGNAME}
+        {BLOGABOUT}
+        "houston.png"
+        "ico.png"
+        "icoW.png"
+
+        Sheets:
+        "index.html"
+        "article.html"
+        "about.html"
+        "search.html"
+
+    Logic Section:
+        Slugs:
+        {FORK1}
+        {FORK2}
+        {MONGOURL_ENV}
+        {PEXELS_API_KEY}
+        {OLLAMA_API_KEY}
+
+        Sheets:
+        "index.js"
+        "upload.js"
+        ".env"
+
+    Weather Section:
+        Slugs:
+        {TIMEZONE}
+        {CITY1}, x1, y1
+        {CITY2}, x2, y2
+        {CITY3}, x3, y3
+        {CITY4}, x4, y4
+        {CITY5}, x5, y5
+        {CITY6}, x6, y6
+        {CITY7}, x7, y7
+        {CITY8}, x8, y8
+        {CITY9}, x9, y9
+        {CITY10}, x10, y10
+        {CITY11}, x11, y11
+        {CITY12}, x12, y12
+        {CITY13}, x13, y13
+        {CITY14}, x14, y14
+        {CITY15}, x15, y15
+        {CITY16}, x16, y16
+        {CITY17}, x17, y17
+        {CITY18}, x18, y18
+        {CITY19}, x19, y19
+        {CITY20}, x20, y20
+        {CITY21}, x21, y21
+        {CITY22}, x22, y22
+        {CITY23}, x23, y23
+        {CITY24}, x24, y24
+        {CITY25}, x25, y25
+        Sheets:
+
+        "weather.html"
+
+    Monetary Section: 
+        Slugs:
+        {AD_CODE}
+        
+        Sheets:
+        "article.html"
+
+#########################################################################################################
+
+Profile Section:
+Your domain: {BLOGURL}
+
+Your newsletter name: {BLOGNAME}
+
+Write an About page: {BLOGABOUT}
+
+Upload your Icons
+Skyline: {houston.png(1536x1024px)}
+Light Theme: {ico.png(1000x1000px)}
+Dark Theme: {icoW.png(1000x1000px)}
+
+#########################################################################################################
+
+Logic Section:
+Step 1: Where do you want to scrape articles from:
+    {FORK1}
+    {FORK2}
+
+Step 2: Provide your MongoDB API Key: {MONGOURL_ENV}
+
+Step 3: Provide your Pexels API Key: {PEXELS_API_KEY}
+
+Step 4: Provide your Ollama API Key: {OLLAMA_API_KEY}
+
+#########################################################################################################
+
+Weather Section:
+Step 1: Enter your timezone {TIMEZONE}
+
+Step 2: Enter the names of your 25 areas:
+    1: {CITY1}
+    2: {CITY2}
+    3: {CITY3}
+    4: {CITY4}
+    5: {CITY5}
+    6: {CITY6}
+    7: {CITY7}
+    8: {CITY8}
+    9: {CITY9}
+    10: {CITY10}
+    11: {CITY11}
+    12: {CITY12}
+    13: {CITY13}
+    14: {CITY14}
+    15: {CITY15}
+    16: {CITY16}
+    17: {CITY17}
+    18: {CITY18}
+    19: {CITY19}
+    20: {CITY20}
+    21: {CITY21}
+    22: {CITY22}
+    23: {CITY23}
+    24: {CITY24}
+    25: {CITY25}
+
+Step 3: Enter the Longitude and Lattitude of each area:
+    {CITY1}: x1, y1
+    {CITY2}: x2, y2
+    {CITY3}: x3, y3
+    {CITY4}: x4, y4
+    {CITY5}: x5, y5
+    {CITY6}: x6, y6
+    {CITY7}: x7, y7
+    {CITY8}: x8, y8
+    {CITY9}: x9, y9
+    {CITY10}: x10, y10
+    {CITY11}: x11, y11
+    {CITY12}: x12, y12
+    {CITY13}: x13, y13
+    {CITY14}: x14, y14
+    {CITY15}: x15, y15
+    {CITY16}: x16, y16
+    {CITY17}: x17, y17
+    {CITY18}: x18, y18
+    {CITY19}: x19, y19
+    {CITY20}: x20, y20
+    {CITY21}: x21, y21
+    {CITY22}: x22, y22
+    {CITY23}: x23, y23
+    {CITY24}: x24, y24
+    {CITY25}: x25, y25
+
+#########################################################################################################
+
+Monetary Section:
+
+Do you have an ad provider:
+    A: Yes
+    B: No
+    C: No, and I don't want ads
+
+Step 1A: Enter your billboard (Wide Banner) ad snippet {AD_CODE}
+
+Step 1B: Sign up with Adsterra: here(https://beta.publishers.adsterra.com/referral/c1Ud84596S)
+Step 2B: Paste your 728x90 banner ad code here:
+
+#########################################################################################################
+
+Done Section:
+
+All finished! Click "Done" when you're ready to generate your ready to use website as a zip file!
+
+Done: Save as .zip

@@ -1,0 +1,190 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <title>City Weather</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <style>
+    body {
+      min-height: 100vh;
+      margin: 0;
+      /* Original background gradient from previous design */
+      background: linear-gradient(90deg, rgba(15,23,36,1) 0%, rgba(8,13,22,1) 100%);
+      font-family: 'Roboto', Arial, sans-serif;
+    }
+    .weather-section {
+      max-width: 420px;
+      margin-left: 0;
+      margin-right: auto;
+      margin-top: 0;
+      margin-bottom: 0;
+      padding: 32px 0 32px 32px;
+      /* Optionally add a slight background for contrast */
+      /* background: rgba(0,0,0,0.1); */
+    }
+  </style>
+</head>
+<body>
+  <div class="weather-section">
+    <h2 id="timer" style="font-size: 32px; text-align: center; color: white;">00:00xm</h2>
+    <div class="weather-card"><h1>{CITY1}</h1><h2 id="1"></h2></div>
+    <div class="weather-card"><h1>{CITY2}</h1><h2 id="2"></h2></div>
+    <div class="weather-card"><h1>{CITY3}</h1><h2 id="3"></h2></div>
+    <div class="weather-card"><h1>{CITY4}</h1><h2 id="4"></h2></div>
+    <div class="weather-card"><h1>{CITY5}</h1><h2 id="5"></h2></div>
+    <div class="weather-card"><h1>{CITY6}</h1><h2 id="6"></h2></div>
+    <div class="weather-card"><h1>{CITY7}</h1><h2 id="7"></h2></div>
+    <div class="weather-card"><h1>{CITY8}</h1><h2 id="8"></h2></div>
+    <div class="weather-card"><h1>{CITY9}</h1><h2 id="9"></h2></div>
+    <div class="weather-card"><h1>{CITY10}</h1><h2 id="10"></h2></div>
+    <div class="weather-card"><h1>{CITY11}</h1><h2 id="11"></h2></div>
+    <div class="weather-card"><h1>{CITY12}</h1><h2 id="12"></h2></div>
+    <div class="weather-card"><h1>{CITY13}</h1><h2 id="13"></h2></div>
+    <div class="weather-card"><h1>{CITY14}</h1><h2 id="14"></h2></div>
+    <div class="weather-card"><h1>{CITY15}</h1><h2 id="15"></h2></div>
+    <div class="weather-card"><h1>{CITY16}</h1><h2 id="16"></h2></div>
+    <div class="weather-card"><h1>{CITY17}</h1><h2 id="17"></h2></div>
+    <div class="weather-card"><h1>{CITY18}</h1><h2 id="18"></h2></div>
+    <div class="weather-card"><h1>{CITY19}</h1><h2 id="19"></h2></div>
+    <div class="weather-card"><h1>{CITY20}</h1><h2 id="20"></h2></div>
+    <div class="weather-card"><h1>{CITY21}</h1><h2 id="21"></h2></div>
+    <div class="weather-card"><h1>{CITY22}</h1><h2 id="22"></h2></div>
+    <div class="weather-card"><h1>{CITY23}</h1><h2 id="23"></h2></div>
+    <div class="weather-card"><h1>{CITY24}</h1><h2 id="24"></h2></div>
+    <div class="weather-card"><h1>{CITY25}</h1><h2 id="25"></h2></div>
+  </div>
+  <script>
+    // Timer functionality for Central Daylight Time (CDT)
+    function updateTimer() {
+      const timerElement = document.getElementById('timer');
+      if (!timerElement) return;
+      const now = new Date();
+      const options = { timeZone: '{TIMEZONE}', hour: '2-digit', minute: '2-digit', hour12: true };
+      const timeString = new Intl.DateTimeFormat('en-US', options).format(now);
+      timerElement.textContent = timeString;
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    // Weather functionality using NWS API
+    const zipToLatLon = {
+      '1': { lat: x1, lon: y1 }, // CITY1
+      '2': { lat: x2, lon: y2 }, // CITY2
+      '3': { lat: x3, lon: y3 }, // CITY3
+      '4': { lat: x4, lon: y4 }, // CITY4
+      '5': { lat: x5, lon: y5 }, // CITY5
+      '6': { lat: x6, lon: y6 }, // CITY6
+      '7': { lat: x7, lon: y7 }, // CITY7
+      '8': { lat: x8, lon: y8 }, // CITY8
+      '9': { lat: x9, lon: y9 }, // CITY9
+      '10': { lat: x10, lon: y10 }, // CITY10
+      '11': { lat: x11, lon: y11 }, // CITY11
+      '12': { lat: x12, lon: y12 }, // CITY12
+      '13': { lat: x13, lon: y13 }, // CITY13
+      '14': { lat: x14, lon: y14 }, // CITY14
+      '15': { lat: x15, lon: y15 }, // CITY15
+      '16': { lat: x16, lon: y16 }, // CITY16
+      '17': { lat: x17, lon: y17 }, // CITY17
+      '18': { lat: x18, lon: y18 }, // CITY18
+      '19': { lat: x19, lon: y19 }, // CITY19
+      '20': { lat: x20, lon: y20 }, // CITY20
+      '21': { lat: x21, lon: y21 }, // CITY21
+      '22': { lat: x22, lon: y22 }, // CITY22
+      '23': { lat: x23, lon: y23 }, // CITY23
+      '24': { lat: x24, lon: y24 }, // CITY24
+      '25': { lat: x25, lon: y25 }  // CITY25
+    };
+
+    async function fetchWeatherNWS(lat, lon) {
+      const url = `https://api.weather.gov/points/${lat},${lon}`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Failed to fetch weather for ${lat},${lon}: ${response.statusText}`);
+        const data = await response.json();
+        const hourlyForecastUrl = data.properties.forecastHourly;
+        const hourlyResponse = await fetch(hourlyForecastUrl);
+        if (!hourlyResponse.ok) throw new Error(`Failed to fetch hourly forecast: ${hourlyResponse.statusText}`);
+        const hourlyData = await hourlyResponse.json();
+        const now = new Date();
+        const currentHour = hourlyData.properties.periods.find(period => {
+          const startTime = new Date(period.startTime);
+          const endTime = new Date(period.endTime);
+          return now >= startTime && now <= endTime;
+        });
+        if (currentHour) {
+          return { temperature: currentHour.temperature, shortForecast: currentHour.shortForecast };
+        } else {
+          throw new Error('No hourly forecast data available for the current time.');
+        }
+      } catch (error) {
+        console.error(`Error fetching weather for ${lat},${lon}:`, error);
+        return null;
+      }
+    }
+
+    async function updateWeather() {
+      for (const [zip, { lat, lon }] of Object.entries(zipToLatLon)) {
+        const result = await fetchWeatherNWS(lat, lon);
+        const weatherElement = document.getElementById(zip);
+        if (weatherElement && result !== null) {
+          const temp = result.temperature;
+          const cond = result.shortForecast || '';
+          weatherElement.textContent = `${temp}°F`;
+          applyTempClass(weatherElement, temp);
+          applyWeatherIcon(weatherElement, cond);
+        }
+      }
+    }
+
+    function pickIconClassForCondition(cond){
+      if(!cond) return 'fa-solid fa-sun';
+      const c = cond.toLowerCase();
+      if(c.includes('thunder') || c.includes('storm') || c.includes('tstm')) return 'fa-solid fa-bolt';
+      if(c.includes('rain') || c.includes('showers')) return 'fa-solid fa-cloud-showers-heavy';
+      if(c.includes('snow') || c.includes('sleet') || c.includes('flurr')) return 'fa-solid fa-snowflake';
+      if(c.includes('tornado')) return 'fa-solid fa-tornado';
+      if(c.includes('hurricane') || c.includes('tropical')) return 'fa-solid fa-hurricane';
+      if(c.includes('cloud') || c.includes('overcast')) return 'fa-solid fa-cloud';
+      if(c.includes('wind') || c.includes('breezy')) return 'fa-solid fa-wind';
+      if(c.includes('sun') || c.includes('clear')) return 'fa-solid fa-sun';
+      return 'fa-solid fa-sun';
+    }
+
+    function applyWeatherIcon(h2el, cond){
+      if(!h2el) return;
+      let icon = h2el.querySelector('i.weather-icon');
+      if(!icon){
+        icon = document.createElement('i');
+        icon.className = 'weather-icon';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.style.marginLeft = '8px';
+        h2el.appendChild(icon);
+      }
+      const cls = pickIconClassForCondition(cond);
+      icon.className = cls + ' weather-icon';
+      icon.style.color = 'currentColor';
+    }
+
+    function applyTempClass(el, temp){
+      if(!el) return;
+      el.classList.remove('temp-90','temp-80','temp-70','temp-60','temp-50','temp-40','temp-30','temp-29');
+      const t = Number(temp);
+      if(Number.isNaN(t)) return;
+      if(t >= 90) el.classList.add('temp-90');
+      else if(t >= 80) el.classList.add('temp-80');
+      else if(t >= 70) el.classList.add('temp-70');
+      else if(t >= 60) el.classList.add('temp-60');
+      else if(t >= 50) el.classList.add('temp-50');
+      else if(t >= 40) el.classList.add('temp-40');
+      else if(t >= 30) el.classList.add('temp-30');
+      else el.classList.add('temp-29');
+    }
+    updateWeather();
+  </script>
+</body>
+</html>

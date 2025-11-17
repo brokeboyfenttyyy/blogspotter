@@ -1,0 +1,11 @@
+{
+  "name": "hourly-houston",
+  "version": "1.0.0",
+  "description": "Hourly Houston static site with Vercel serverless API",
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "mongodb": "^5.9.0"
+  }
+}

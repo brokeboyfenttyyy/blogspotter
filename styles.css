@@ -1,0 +1,791 @@
+/* Roboto helper class (use this on elements that need explicit Roboto settings) */
+.roboto {
+  font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400; /* default weight; change to 100/300/700/etc as needed */
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Roboto", sans-serif;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+html {
+  background-color: #0e1623;
+}
+
+body {
+  height: 100%;
+  background-color: #ddd;
+}
+
+
+/* CSS for the header */
+:root{
+  --bg: #0f1724;            /* deep background */
+  --muted: #fff;         /* muted text */
+  --glass: rgba(255,255,255,0.06);
+  --radius: 10px;
+}
+
+/* basic reset for elements used here */
+.site-header, .header-left, .header-right {
+  box-sizing: border-box;
+}
+
+/* header container */
+.site-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 1rem;
+  background: linear-gradient(180deg, rgba(15,23,36,1) 0%, rgba(8,13,22,1) 100%);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 6px 18px rgba(2,6,23,0.45);
+  color: white;
+  text-shadow: 2px 2px 4px #000000;
+  margin-bottom: 2vw;
+  z-index: 2000; /* ensure header (and hamburger) sits above the drawer/backdrop */
+}
+
+/* left side: logo + title */
+.header-left{
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* make the header-left anchor behave like the container so logo+title remain inline and clickable */
+.header-left .home-link{
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo{
+  display: block;
+  width: 44px;              /* tweak as needed */
+  height: 44px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: var(--glass);
+  padding: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35) inset;
+}
+
+/* title */
+.site-title{
+  margin: 0;
+  font-size: 23px;
+  letter-spacing: 0.2px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+}
+
+/* right side */
+.header-right{
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: #0e1623;
+  color: white;
+  text-shadow: 2px 2px 4px #000000;
+  font-size: 0.9rem;
+  margin-top: 2rem;
+}
+
+/* button and anchor styles */
+.cta-link{
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn{
+  display: block;
+  width: 120px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: var(--glass);
+  padding: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35) inset;
+  border: 0px solid #000;
+  color: #fff;
+  font-size: 16px;
+}
+
+/* small screens: stack and shrink */
+@media (max-width: 520px){
+  .site-header{
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.6rem;
+  }
+  .header-left{
+    justify-content: flex-start;
+  }
+  .header-right{
+    justify-content: flex-end;
+    margin-top: 0.45rem;
+  }
+  .site-title{
+    font-size: 1rem;
+  }
+  .logo{
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Medium screens: tablet */
+@media (max-width: 980px) {
+  .recent-post-tier {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hero-body {
+    flex: 1 1 60%;
+    margin-left: 1rem;
+  }
+
+  .hero-side {
+    width: 40%;
+    margin-right: 1rem;
+  }
+}
+
+/* Small screens: phones */
+@media (max-width: 520px) {
+  .recent-post-tier {
+    grid-template-columns: 1fr;
+    padding: 8px;
+    gap: 12px;
+  }
+
+  .hero-body {
+    width: 100%;
+    margin-left: 0;
+    padding: 0.5rem;
+  }
+
+  .hero-side {
+    width: 100%;
+    margin-right: 0;
+    padding: 0 0.5rem 1rem 0.5rem;
+  }
+
+  .hero {
+    height: auto; /* allow hero to grow with content */
+  }
+
+  .hero img, .story-card img {
+    height: auto;
+    max-height: 420px;
+  }
+
+  .page-holding {
+    max-width: 100%;
+    padding: 0.5rem;
+  }
+
+  /* remove extra gaps/margins on very small screens */
+  .hero-container { gap: 0; margin-bottom: 0; }
+  .hero-body { margin-left: 0; padding: 0; }
+  .hero-side { margin-right: 0; padding: 0; }
+}
+
+/* Zoom/overflow safety: ensure story cards don't overflow container when page is zoomed */
+@media (min-resolution: 2dppx) {
+  .story-card img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Tweak typography for small screens */
+@media (max-width: 420px) {
+  .site-title { font-size: 1rem; }
+  .hero h1 { font-size: 1.25rem; bottom: 90px; left: 16px; margin-bottom: 20px; }
+  .hero p { font-size: 1rem; left: 16px; }
+}
+
+.hero-container {
+  display: flex;
+  width: 100%;
+  gap: 2vw;
+  margin-bottom: 2vw;
+  flex-wrap: wrap; /* allow sidebar to drop below on narrow screens */
+  align-items: stretch; /* Ensure children stretch to the same height */
+}
+
+.hero-body {
+  flex: 1 1 680px; /* Flexible width with a base size */
+  min-width: 300px;
+  background-color: #fff;
+  margin-left: 2vw;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.45);
+  margin-bottom: 2vw;
+  height: 1492px; /* Allow height to adjust based on content */
+  display: flex; /* make hero-body a column flex container so pager can stick to bottom */
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 60vh; /* ensure there's room for content and the pager to sit at bottom */
+}
+
+.recent-post-tier {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columns of equal width */
+  gap: 20px; /* space between items, adjust as needed */
+  padding: 10px;
+  align-items: start;
+}
+
+/* allow the grid to grow and push the pager to the bottom of .hero-body */
+.recent-post-tier { flex: 1 1 auto; }
+
+.page-holding {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: 680px; /* keeps pager visually balanced with story grid */
+  margin: 30px auto 0; /* top 30px, horizontally centered */
+  border-radius: 14px;
+  padding: 0.5rem;
+  background: linear-gradient(90deg, rgba(15,23,36,0.95), rgba(8,13,22,0.95));
+  box-shadow: 0 6px 20px rgba(2,6,23,0.35);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: white;
+  margin-bottom: 40px;
+}
+
+/* push pager to the bottom of the .hero-body container */
+.hero-body .page-holding { margin-top: auto; }
+
+/* sticky fallback: keep pager visible near bottom on long content */
+.page-holding.sticky {
+  position: sticky;
+  bottom: 12px;
+  z-index: 100;
+}
+
+/* responsive: let the pager fill available width on narrow screens */
+@media (max-width: 520px) {
+  .page-holding {
+    width: 100%;
+    margin: 20px 0 0 0;
+    border-radius: 12px;
+    padding: 0.5rem;
+  }
+}
+
+
+.page-indexer {
+  display: flex;
+  justify-content: center; /* centers the inner content */
+  align-items: center;
+  gap: 12px;
+}
+
+.page-indexer .arrow {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.page-indexer .arrow:hover,
+.page-indexer .arrow:focus {
+  transform: translateY(-2px);
+  outline: none;
+  color: #fff;
+}
+
+.page-indexer .page-number {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.04);
+  box-shadow: 0 2px 8px rgba(2,6,23,0.35) inset;
+}
+
+.story-card {
+  background-color: #ffffff; /* white background for the article */
+  border-radius: 8px;        /* slightly rounded corners */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* subtle shadow */
+  overflow: hidden;          /* ensures image corners are rounded */
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s, box-shadow 0.3s;
+  height: 375px
+}
+
+.story-card:hover {
+  transform: translateY(-5px); /* subtle lift on hover */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.story-card img {
+  width: 100%;
+  height: 180px;   /* fixed height, can adjust */
+  object-fit: cover; /* ensures image covers container nicely */
+}
+
+.story-card h1 {
+  font-size: 1.2rem;
+  margin: 16px;
+  color: #111;
+}
+
+.story-card p {
+  font-size: 0.95rem;
+  margin: 0 16px 16px 16px;
+  color: #444;
+  line-height: 1.5;
+}
+
+.hero-side {
+  width: 25%; /* Sidebar width */
+  background: linear-gradient(90deg, rgba(15,23,36,1) 0%, rgba(8,13,22,1) 100%);
+  margin-right: 2vw;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.45); 
+  text-shadow: 2px 2px 4px #000000;
+  margin-bottom: 2vw;
+  height: 1492px;; /* Allow height to stretch with .hero-body */
+}
+
+/* Mobile: hide the sidebar by default and present it as an off-canvas drawer toggled by the hamburger */
+/* Checkbox pattern removed in favor of a button-driven drawer; keep this placeholder in case it's reintroduced */
+.menu-toggle { display: none; }
+
+.hamburger {
+  display: none; /* visible only on small screens via media query */
+  width: 36px;
+  height: 28px;
+  position: relative;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  padding: 6px;
+  line-height: 0;
+}
+.hamburger::before,
+.hamburger::after,
+.hamburger span {
+  content: "";
+  display: block;
+  height: 3px;
+  background: #fff;
+  border-radius: 3px;
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.hamburger::before { top: 4px; }
+.hamburger span { top: 50%; transform: translateY(-50%); }
+.hamburger::after { bottom: 0; }
+
+/* hide the drawer close button on larger screens (only needed for mobile drawer) */
+.drawer-close { display: none; }
+
+@media (max-width: 520px) {
+  .hamburger { display: inline-block; margin-left: 8px; }
+  .header-right { align-items: center; gap: 8px; }
+
+  /* fine-tune hamburger visuals (three bars) */
+  .hamburger::before,
+  .hamburger::after,
+  .hamburger span {
+    content: "";
+    display: block;
+    height: 3px;
+    background: #fff;
+    border-radius: 3px;
+    position: absolute;
+    left: 6px;
+    right: 6px;
+  }
+  .hamburger::before { top: 6px; }
+  .hamburger span { top: 50%; transform: translateY(-50%); }
+  .hamburger::after { bottom: 6px; }
+
+  .hamburger:focus { outline: 2px solid rgba(255,255,255,0.18); border-radius: 6px; }
+
+  /* drawer close button */
+  .drawer-close {
+    position: absolute;
+    right: 12px;
+    top: 10px;
+    background: transparent;
+    border: 0;
+    color: #fff;
+    font-size: 28px;
+    line-height: 1;
+    padding: 6px 8px;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+  .drawer-close { display: block; }
+  .drawer-close:focus { outline: 2px solid rgba(255,255,255,0.18); }
+
+  /* allow vertical panning by default on mobile so touch scrolls the page */
+  html, body { touch-action: pan-y; -ms-touch-action: pan-y; }
+
+  /* off-canvas drawer */
+  .hero-side {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 76vw;
+    max-width: 360px;
+    transform: translateX(110%);
+    transition: transform 0.28s cubic-bezier(.2,.9,.3,1), box-shadow 0.28s ease;
+    z-index: 1200;
+    padding: 1.25rem;
+    /* don't intercept pointer events while hidden off-canvas */
+    pointer-events: none;
+    /* softer, slightly translucent background so it blends with content */
+    background: linear-gradient(180deg, rgba(8,13,22,0.96), rgba(15,23,36,0.92));
+    border-left: 1px solid rgba(255,255,255,0.04);
+    margin: 0;
+    overflow-y: auto; /* allow the drawer to scroll independently */
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y; /* allow vertical scroll gestures inside the drawer */
+    box-shadow: -18px 0 40px rgba(2,6,23,0.35);
+  }
+
+  /* when menu toggle is checked, slide the drawer in */
+  /* when body has .menu-open, slide the drawer in */
+  body.menu-open .hero-side {
+    transform: translateX(0%);
+    /* enable interaction when visible */
+    pointer-events: auto;
+  }
+
+  /* backdrop element - will be toggled visible when the menu checkbox is checked */
+  .backdrop{
+    opacity: 0; 
+    visibility: hidden; 
+    position: fixed; 
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 1190; /* keep below drawer */
+    cursor: pointer;
+    transition: opacity 240ms ease, visibility 240ms ease;
+    /* don't block pointer events when hidden */
+    pointer-events: none;
+  }
+
+  body.menu-open .backdrop { opacity: 1; visibility: visible; pointer-events: auto; }
+}
+
+/* header remains interactive; when menu is open the header should still be above the dim */
+body.menu-open .site-header { pointer-events: auto; }
+
+/* helper to lock body scroll when drawer open (JS toggles this) - only on small screens */
+@media (max-width: 520px) {
+  body.no-scroll { overflow: hidden; }
+}
+
+.weather-card {
+  display: flex;
+  justify-content: space-between; /* Align h1 to the left and h2 to the right */
+  border-bottom: 3px solid white;
+  color: white;
+  margin: 5px 20px;
+  font-size: 11px;
+  border-radius: 5px;
+  padding: 5px; /* Add padding for better spacing */
+}
+
+.weather-card h1 {
+  margin: 0; /* Remove default margin */
+  text-shadow: 2px 2px 4px #000000;
+}
+
+.weather-card h2 {
+  margin: 0; /* Remove default margin */
+  text-shadow: 2px 2px 4px #000000;
+}
+
+/* Temperature color classes (applied to the h2 inside .weather-card)
+   Ranges mapped as: >=90, 80-89, 70-79, 60-69, 50-59, 40-49, 30-39, <=29 */
+.weather-card h2.temp-90 { color: #ff795f; }
+.weather-card h2.temp-80 { color: #f28774; }
+.weather-card h2.temp-70 { color: #e4958a; }
+.weather-card h2.temp-60 { color: #d4a5a3; }
+.weather-card h2.temp-50 { color: #c4b6bd; }
+.weather-card h2.temp-40 { color: #b5c5d4; }
+.weather-card h2.temp-30 { color: #afcbde; }
+.weather-card h2.temp-29 { color: #9fdcf8; }
+
+/* smooth color transitions when temps update */
+.weather-card h2 { transition: color 180ms ease-in-out; }
+
+.side-ad-card {
+  margin: 100px auto 0 auto;
+  width: 300px;
+  height: 250px;
+  background: linear-gradient(270deg, rgba(15,23,36,1) 0%, rgba(8,13,22,1) 100%);
+  border: 3px solid white;
+  border-radius: 5px;
+}
+
+.hero {
+  position: relative;
+  width: 100%;
+  height: 550px;
+  overflow: hidden;
+  margin-bottom: 50px;
+}
+
+.hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease; /* smooth zoom */
+}
+/* Zoom effect */
+.hero:hover img {
+  transform: scale(1.05);
+}
+
+/* Bottom vignette overlay */
+.hero::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  pointer-events: none;
+}
+
+/* Replacement hero wrapper and image styles for article page (no .hero logic) */
+#hero-wrap {
+  position: relative;
+  width: 100%;
+  height: 550px;
+  overflow: hidden;
+  margin-bottom: 50px;
+}
+
+#hero-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+}
+
+/* Zoom effect */
+#hero-wrap:hover img { transform: scale(1.05); }
+
+/* Bottom vignette overlay on the wrapper */
+#hero-wrap::after{
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  pointer-events: none;
+}
+
+.hero h1 {
+  position: absolute;
+  bottom: 60px;
+  left: 30px;
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: bold;
+  max-width: 80%;
+  z-index: 1;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
+  margin-bottom: 20px;
+}
+
+.hero p {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  max-width: 80%;
+  z-index: 2;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.9);
+}
+
+.hero h4 {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  max-width: 80%;
+  z-index: 2;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.9);
+}
+
+/* Strong mobile overrides: make content single-column and let hero-body take full width
+   This ensures the sidebar (hero-side) acts as an off-canvas drawer while main content fills the viewport. */
+@media (max-width: 520px) {
+  .recent-post-tier {
+    grid-template-columns: 1fr; /* single column list on mobile */
+    gap: 12px;
+    padding: 8px 4px;
+  }
+
+  .hero-body {
+    flex: 1 1 100% !important; /* occupy full available width */
+    min-width: 0 !important;    /* allow shrinking inside flex container */
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+
+  .hero-container {
+    gap: 0 !important;
+  }
+
+  /* ensure story cards stretch full width */
+  .story-card { width: 100%; }
+}
+
+.article-section {
+  padding: 25px;
+}
+
+.article-section h1{
+  text-transform: uppercase;
+  font-size: 3rem;
+}
+
+.article-section h2{
+  font-size: 1.7rem;
+  margin-bottom: 10px;
+}
+
+
+.article-section h3{
+  font-size: 1.4rem;
+  margin-bottom: 40px;
+}
+
+.article-section p{
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+/* Search form in header (desktop only) */
+.search-form{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.search-form input[type="search"]{
+  width: 220px;
+  height: 40px;
+  border-radius: 8px;
+  border: 0;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+}
+.search-form button{
+  height: 36px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 0;
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  cursor: pointer;
+}
+
+/* hide search on small screens where the drawer is the main UI */
+@media (max-width: 520px){
+  .search-form{ display: none; }
+}
+
+/* Search results row layout used on search.html */
+.search-results { display: flex; flex-direction: column; gap: 12px; padding: 12px; }
+.search-row {
+  display: grid;
+  grid-template-columns: 140px 1fr 140px; /* image | content | date */
+  gap: 12px;
+  align-items: center;
+  background: #fff;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.search-row img{ width: 140px; height: 100px; object-fit: cover; border-radius: 6px; }
+.search-row .meta-date{ text-align: right; font-size: 0.9rem; color: #666; }
+.search-row .row-title{ font-size: 1.05rem; margin-bottom: 6px; color: #111; }
+.search-row .row-excerpt{ color: #444; font-size: 0.95rem; line-height: 1.3; }
+
+@media (max-width: 720px){
+  .search-row{ grid-template-columns: 1fr; }
+  .search-row img{ width: 100%; height: 180px; }
+  .search-row .meta-date{ text-align: left; }
+}
+
+/* small helper to visually hide labels while keeping them accessible */
+.visually-hidden{ position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; }
+
+/* Skip link — visible on focus for keyboard users */
+.skip-link{
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  background: #000;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  z-index: 9999;
+  transform: translateY(-120%);
+  transition: transform 0.16s ease;
+}
+.skip-link:focus{
+  transform: translateY(0%);
+  outline: 3px solid rgba(255,255,255,0.18);
+}

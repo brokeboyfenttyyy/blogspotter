@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Search - {BLOGNAME}</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+<header class="site-header">
+  <div class="header-left">
+    <a href="/" class="home-link">
+      <img src="img/icoW.png" alt="{BLOGNAME} logo" class="logo">
+        <h2 class="site-title">{BLOGNAME}</h2>
+    </a>
+  </div>
+  <div class="header-right">
+    <a href="/about.html" class="cta-link" aria-label="About">
+      <button class="btn">About</button>
+    </a>
+    <form class="search-form" action="/search.html" method="get" role="search">
+      <label for="q" class="visually-hidden">Search articles</label>
+      <input id="q" name="q" type="search" placeholder="Search articles" aria-label="Search articles">
+      <button type="submit" aria-label="Submit search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
+    </form>
+    <button class="hamburger" aria-label="Open menu" aria-controls="drawer" aria-expanded="false" title="Open menu"><span class="bar"></span></button>
+  </div>
+</header>
+<div class="hero-container">
+  <div class="hero-body" id="main">
+    <div class="hero" tabindex="-1" aria-live="polite">
+      <img src="/img/houston.png" alt="{BLOGNAME} skyline">
+      <h1 style="padding:18px;">Search results</h1>
+    </div>
+
+    <div class="search-results" id="results"></div>
+
+  </div>
+
+  <div class="hero-side" id="drawer" role="dialog" aria-modal="true" aria-hidden="true">
+    <button class="drawer-close" aria-label="Close menu">×</button>
+    <iframe src="weather.html" title="{BLOGNAME} Weather" style="width:100%;min-width:320px;height:100vh;border:none;background:transparent;" loading="lazy"></iframe>
+  </div>
+  </div>
+</div>
+
+<script>
+// Client-side search page: reads ?q=, fetches /api/posts (all) and filters by title or body
+(function(){
+  function qsParam(name){
+    try{ const s = new URLSearchParams(location.search); return s.get(name) || ''; }catch(e){ return ''; }
+  }
+
+  function firstParagraph(text){
+    if(!text) return '';
+    const parts = text.split(/\n\n+/);
+    return parts.length ? parts[0].replace(/\n/g, ' ') : text;
+  }
+
+  function formatDate(iso){
+    if(!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleString();
+  }
+
+  async function fetchAllPosts(){
+    // request a large perPage to get a lot of posts; API returns hero separate so request a high number
+    const res = await fetch('/api/posts?page=1&perPage=1000');
+    if(!res.ok) throw new Error('fetch failed');
+    const json = await res.json();
+    // api returns { posts, total } and hero is excluded server-side; also fetch hero to include it
+    const heroRes = await fetch('/api/posts?hero=1');
+    const heroJson = heroRes.ok ? await heroRes.json() : null;
+    const hero = heroJson && heroJson.post ? heroJson.post : null;
+    const posts = Array.isArray(json.posts) ? json.posts.slice() : [];
+    if(hero){ posts.unshift(hero); }
+    return posts;
+  }
+
+  function slugify(s){
+    if(!s) return '';
+    return String(s).toLowerCase().trim()
+      .replace(/["'’]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  function renderResults(list, container){
+    container.innerHTML = '';
+    container.setAttribute('role', 'list');
+    if(!list.length){ container.innerHTML = '<div style="padding:20px;">No matching articles found.</div>'; return; }
+    for(const post of list){
+      // prefer server-provided slug, fallback to client-side slugify
+      const slug = post.slug ? String(post.slug).toLowerCase() : slugify(post.title || '');
+      const href = '/articles/' + encodeURIComponent(slug);
+
+      // make each result an anchor for proper semantics and keyboard support
+      const anchor = document.createElement('a');
+      anchor.className = 'search-row';
+      anchor.href = href;
+      anchor.setAttribute('role', 'listitem');
+      anchor.setAttribute('aria-label', post.title || 'Article');
+      anchor.style.textDecoration = 'none';
+      anchor.style.color = 'inherit';
+
+      const imgWrap = document.createElement('div');
+      const img = document.createElement('img'); img.src = post.url || ''; img.alt = post.title || '';
+      imgWrap.appendChild(img);
+
+      const mid = document.createElement('div');
+      const t = document.createElement('div'); t.className = 'row-title'; t.textContent = post.title || '';
+      const ex = document.createElement('div'); ex.className = 'row-excerpt'; ex.textContent = firstParagraph(post.body || '');
+      mid.appendChild(t); mid.appendChild(ex);
+
+      const right = document.createElement('div'); right.className = 'meta-date'; right.textContent = formatDate(post.scrapedAt || '');
+
+      anchor.appendChild(imgWrap); anchor.appendChild(mid); anchor.appendChild(right);
+      container.appendChild(anchor);
+    }
+  }
+
+  async function run(){
+    const q = (qsParam('q') || '').trim();
+    const input = document.getElementById('q'); if(input) input.value = q;
+    const resultsEl = document.getElementById('results');
+    try{
+      const all = await fetchAllPosts();
+      if(!q){ renderResults(all, resultsEl); return; }
+      const k = q.toLowerCase();
+      const filtered = all.filter(p => {
+        const t = (p.title||'').toLowerCase();
+        const b = (p.body||'').toLowerCase();
+        return t.includes(k) || b.includes(k);
+      });
+      renderResults(filtered, resultsEl);
+    }catch(err){ console.error('search error', err); resultsEl.innerHTML = '<div style="padding:20px;">Error loading results.</div>'; }
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
+})();
+</script>
+<script>
+// Drawer behavior, timer, and weather functionality (copied from index/article pages)
+(function(){
+  // Timer
+  function updateTimer() {
+    const timerElement = document.getElementById('timer');
+    if (!timerElement) return;
+    const now = new Date();
+    const options = { timeZone: 'America/Chicago', hour: '2-digit', minute: '2-digit', hour12: true };
+    const timeString = new Intl.DateTimeFormat('en-US', options).format(now);
+    timerElement.textContent = timeString;
+  }
+  setInterval(updateTimer, 1000);
+  updateTimer();
+
+  // Zip to lat/lon map
+  const zipToLatLon = {
+    '77002': { lat: 29.752552016514958, lon: -95.37041452085252 },
+    '77006': { lat: 29.743058828618043, lon: -95.38872535855693 },
+    '77380': { lat: 30.156561330335677, lon: -95.49660348630132 },
+    '77373': { lat: 30.060076989444728, lon: -95.38425991103118 },
+    '77339': { lat: 30.044222740754748, lon: -95.21623381365497 },
+    '77024': { lat: 29.785061559286614, lon: -95.55081109649475 },
+    '77493': { lat: 29.86892877253447, lon: -95.83598143772524 },
+    '77584': { lat: 29.530560656795313, lon: -95.32129891012985 },
+    '77478': { lat: 29.619364025666467, lon: -95.60777755914671 },
+    '77502': { lat: 29.68279320790105, lon: -95.2012332550293 },
+    '77520': { lat: 29.729931184106412, lon: -94.98634034561468 },
+    '77338': { lat: 29.936252806244546, lon: -95.22575025287787 },
+    '77550': { lat: 29.3056910729656, lon: -94.79363293237242 },
+    '77571': { lat: 29.681951027430866, lon: -95.0504713333233 },
+    '77301': { lat: 30.372421017538844, lon: -95.45451089868827 },
+    '77375': { lat: 30.11186355029859, lon: -95.58409952099358 },
+    '77429': { lat: 30.014649608810636, lon: -95.66645508653544 },
+    '77459': { lat: 29.478751988175286, lon: -95.52957848248982 },
+    '77477': { lat: 29.622026902031646, lon: -95.56770250882548 },
+    '77586': { lat: 29.583383471744852, lon: -95.0348656373267 },
+    '77573': { lat: 29.495046460629094, lon: -95.09075177952913 },
+    '77336': { lat: 30.074194329781477, lon: -95.09146031763426 },
+    '77346': { lat: 29.998823130908438, lon: -95.17521190149226 },
+    '77077': { lat: 29.748046372801, lon: -95.62195225406828 },
+    '77530': { lat: 29.79477265921269, lon: -95.1119367314215 }
+  };
+
+  async function fetchWeatherNWS(lat, lon) {
+    const url = `https://api.weather.gov/points/${lat},${lon}`;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Failed to fetch weather for ${lat},${lon}: ${response.statusText}`);
+      const data = await response.json();
+      const hourlyForecastUrl = data.properties.forecastHourly;
+      const hourlyResponse = await fetch(hourlyForecastUrl);
+      if (!hourlyResponse.ok) throw new Error(`Failed to fetch hourly forecast: ${hourlyResponse.statusText}`);
+      const hourlyData = await hourlyResponse.json();
+      const now = new Date();
+      const currentHour = hourlyData.properties.periods.find(period => {
+        const startTime = new Date(period.startTime);
+        const endTime = new Date(period.endTime);
+        return now >= startTime && now <= endTime;
+      });
+      if (currentHour) {
+        return { temperature: currentHour.temperature, shortForecast: currentHour.shortForecast };
+      } else {
+        throw new Error('No hourly forecast data available for the current time.');
+      }
+    } catch (error) {
+      console.error(`Error fetching weather for ${lat},${lon}:`, error);
+      return null;
+    }
+  }
+
+  function pickIconClassForCondition(cond){
+    if(!cond) return 'fa-solid fa-sun';
+    const c = cond.toLowerCase();
+    if(c.includes('thunder') || c.includes('storm') || c.includes('tstm')) return 'fa-solid fa-bolt';
+    if(c.includes('rain') || c.includes('showers')) return 'fa-solid fa-cloud-showers-heavy';
+    if(c.includes('snow') || c.includes('sleet') || c.includes('flurr')) return 'fa-solid fa-snowflake';
+    if(c.includes('tornado')) return 'fa-solid fa-tornado';
+    if(c.includes('hurricane') || c.includes('tropical')) return 'fa-solid fa-hurricane';
+    if(c.includes('cloud') || c.includes('overcast')) return 'fa-solid fa-cloud';
+    if(c.includes('wind') || c.includes('breezy')) return 'fa-solid fa-wind';
+    if(c.includes('sun') || c.includes('clear')) return 'fa-solid fa-sun';
+    return 'fa-solid fa-sun';
+  }
+
+  function applyWeatherIcon(h2el, cond){
+    if(!h2el) return;
+    let icon = h2el.querySelector('i.weather-icon');
+    if(!icon){
+      icon = document.createElement('i');
+      icon.className = 'weather-icon';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.style.marginLeft = '8px';
+      h2el.appendChild(icon);
+    }
+    const cls = pickIconClassForCondition(cond);
+    icon.className = cls + ' weather-icon';
+    icon.style.color = 'currentColor';
+  }
+
+  function applyTempClass(el, temp){
+    if(!el) return;
+    el.classList.remove('temp-90','temp-80','temp-70','temp-60','temp-50','temp-40','temp-30','temp-29');
+    const t = Number(temp);
+    if(Number.isNaN(t)) return;
+    if(t >= 90) el.classList.add('temp-90');
+    else if(t >= 80) el.classList.add('temp-80');
+    else if(t >= 70) el.classList.add('temp-70');
+    else if(t >= 60) el.classList.add('temp-60');
+    else if(t >= 50) el.classList.add('temp-50');
+    else if(t >= 40) el.classList.add('temp-40');
+    else if(t >= 30) el.classList.add('temp-30');
+    else el.classList.add('temp-29');
+  }
+
+  async function updateWeather(){
+    for (const [zip, { lat, lon }] of Object.entries(zipToLatLon)) {
+      const result = await fetchWeatherNWS(lat, lon);
+      const weatherElement = document.getElementById(zip);
+      if (weatherElement && result !== null) {
+        const temp = result.temperature;
+        const cond = result.shortForecast || '';
+        weatherElement.textContent = `${temp}°F`;
+        applyTempClass(weatherElement, temp);
+        applyWeatherIcon(weatherElement, cond);
+      }
+    }
+  }
+
+  // Drawer open/close handling (basic: mirror index.html behavior)
+  const drawer = document.getElementById('drawer');
+  const backdrop = document.querySelector('.backdrop');
+  const openBtn = document.querySelector('.hamburger');
+  const closeBtn = document.querySelector('.drawer-close');
+  if(drawer && openBtn){
+    let lastFocused = null;
+    function isSmallViewport(){ return window.matchMedia && window.matchMedia('(max-width: 520px)').matches; }
+    function lockScroll(){ if(!isSmallViewport()) return; const scrollY = window.scrollY || document.documentElement.scrollTop || 0; document.body.dataset.scrollY = String(scrollY); document.body.style.position = 'fixed'; document.body.style.top = `-${scrollY}px`; document.body.style.left = '0'; document.body.style.right = '0'; document.body.style.width = '100%'; document.body.classList.add('no-scroll'); }
+    function unlockScroll(){ const prev = document.body.dataset.scrollY ? parseInt(document.body.dataset.scrollY, 10) : 0; document.body.style.position = ''; document.body.style.top = ''; document.body.style.left = ''; document.body.style.right = ''; document.body.style.width = ''; delete document.body.dataset.scrollY; document.body.classList.remove('no-scroll'); window.scrollTo(0, prev); }
+    function openDrawer(){ lastFocused = document.activeElement; document.body.classList.add('menu-open'); drawer.setAttribute('aria-hidden', 'false'); openBtn.setAttribute('aria-expanded', 'true'); if(backdrop) backdrop.setAttribute('aria-hidden', 'false'); lockScroll(); const focusable = drawer.querySelector('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])'); (focusable || drawer).focus(); document.addEventListener('focus', trapFocus, true); document.addEventListener('keydown', onKeyDown, true); }
+    function closeDrawer(){ document.body.classList.remove('menu-open'); drawer.setAttribute('aria-hidden', 'true'); openBtn.setAttribute('aria-expanded', 'false'); if(backdrop) backdrop.setAttribute('aria-hidden', 'true'); unlockScroll(); document.removeEventListener('focus', trapFocus, true); document.removeEventListener('keydown', onKeyDown, true); if(lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus(); }
+    function onKeyDown(e){ if(e.key === 'Escape') { closeDrawer(); } if(e.key === 'Tab') { maintainFocus(e); } }
+    function trapFocus(e){ if(!drawer.contains(e.target) && document.body.classList.contains('menu-open')){ e.stopPropagation(); drawer.querySelector('button, [href], input, textarea, select')?.focus(); } }
+    function maintainFocus(e){ const focusable = Array.from(drawer.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])')).filter(Boolean); if(!focusable.length) return; const first = focusable[0]; const last = focusable[focusable.length - 1]; if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); } else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); } }
+    openBtn.addEventListener('click', function(){ if(document.body.classList.contains('menu-open')) closeDrawer(); else openDrawer(); });
+    if(closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    if(backdrop) backdrop.addEventListener('click', closeDrawer);
+    function syncOnResize(){ if(!isSmallViewport() && document.body.classList.contains('menu-open')) closeDrawer(); }
+    window.addEventListener('resize', syncOnResize);
+    window.addEventListener('orientationchange', syncOnResize);
+    // touch swipe-to-close
+    let startX = null; let startY = null; const threshold = 40; const restraint = 120;
+    drawer.addEventListener('touchstart', function(e){ const t = e.changedTouches[0]; startX = t.pageX; startY = t.pageY; }, {passive:true});
+    drawer.addEventListener('touchend', function(e){ if(startX === null) return; const t = e.changedTouches[0]; const distX = t.pageX - startX; const distY = Math.abs(t.pageY - startY); if(distX > threshold && distY < restraint){ closeDrawer(); } startX = null; startY = null; }, {passive:true});
+  }
+
+  // Start weather updates
+  updateWeather();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="styles.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+	<title>{BLOGNAME}</title>
+	<meta name="description" content="Get updated content for {BLOGNAME}!">
+	<meta name="author" content="{BLOGNAME}">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8">
+	<link rel="icon" href="img/ico.png" media="(prefers-color-scheme: light)">
+	<link rel="icon" href="img/icoW.png" media="(prefers-color-scheme: dark)">
+</head>
+<body>
+	<a href="#main" class="skip-link">Skip to main content</a>
+	<!-- Mobile menu toggle: button-driven accessible drawer (replaces checkbox pattern) -->
+<header class="site-header">
+	<div class="header-left">
+		<a href="/" class="home-link">
+			<img src="img/icoW.png" alt="{BLOGNAME} logo" class="logo">
+			<h2 class="site-title">{BLOGNAME}</h2>
+		</a>
+	</div>
+	<div class="header-right">
+		<a href="/about.html" class="cta-link" aria-label="About">
+			<button class="btn">About</button>
+		</a>
+		<form class="search-form" action="/search.html" method="get" role="search">
+			<label for="q" class="visually-hidden">Search articles</label>
+			<input id="q" name="q" type="search" placeholder="Search articles" aria-label="Search articles">
+			<button type="submit" aria-label="Submit search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
+		</form>
+		<button class="hamburger" aria-label="Open menu" aria-controls="drawer" aria-expanded="false" title="Open menu"><span class="bar"></span></button>
+	</div>
+</header>
+<!-- clickable backdrop: clicking will close the drawer -->
+<div class="backdrop" aria-hidden="true"></div>
+<div class="hero-container">
+	<div class="hero-body">
+		<!-- hero will be rendered here -->
+		<div class="hero" tabindex="-1" aria-live="polite"></div>
+		<!-- grid container for story cards (3 x 2 = 6 per page) -->
+		<div class="recent-post-tier" role="list"></div>
+		<div class="page-holding">
+			<div class="page-indexer">
+				<button class="arrow left" aria-label="Previous page">&#8592;</button>
+				<span class="page-number">Page 1</span>
+				<button class="arrow right" aria-label="Next page">&#8594;</button>
+			</div>
+		</div>
+	</div>
+	<div class="hero-side" id="drawer" role="dialog" aria-modal="true" aria-hidden="true">
+		<button class="drawer-close" aria-label="Close menu">×</button>
+		<iframe src="weather.html" title="{BLOGNAME} Weather" style="width:100%;min-width:320px;height:100vh;border:none;background:transparent;" loading="lazy"></iframe>
+	</div>
+	</div>
+  </div>
+</div>
+<script>
+// Drawer behavior, focus management, ESC handling, swipe-to-close and backdrop handling
+;(function(){
+	const drawer = document.getElementById('drawer');
+	const backdrop = document.querySelector('.backdrop');
+	const openBtn = document.querySelector('.hamburger');
+	const closeBtn = document.querySelector('.drawer-close');
+	if(!drawer || !openBtn) return;
+
+	let lastFocused = null;
+
+	function isSmallViewport(){ return window.matchMedia && window.matchMedia('(max-width: 520px)').matches; }
+
+	function lockScroll(){
+		if(!isSmallViewport()) return;
+		const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+		document.body.dataset.scrollY = String(scrollY);
+		document.body.style.position = 'fixed';
+		document.body.style.top = `-${scrollY}px`;
+		document.body.style.left = '0';
+		document.body.style.right = '0';
+		document.body.style.width = '100%';
+		document.body.classList.add('no-scroll');
+	}
+
+	function unlockScroll(){
+		const prev = document.body.dataset.scrollY ? parseInt(document.body.dataset.scrollY, 10) : 0;
+		document.body.style.position = '';
+		document.body.style.top = '';
+		document.body.style.left = '';
+		document.body.style.right = '';
+		document.body.style.width = '';
+		delete document.body.dataset.scrollY;
+		document.body.classList.remove('no-scroll');
+		window.scrollTo(0, prev);
+	}
+
+	function openDrawer(){
+		lastFocused = document.activeElement;
+		document.body.classList.add('menu-open');
+		drawer.setAttribute('aria-hidden', 'false');
+		openBtn.setAttribute('aria-expanded', 'true');
+		if(backdrop) backdrop.setAttribute('aria-hidden', 'false');
+		lockScroll();
+		// move focus to the first focusable element inside the drawer (close button)
+		const focusable = drawer.querySelector('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])');
+		(focusable || drawer).focus();
+		// trap focus
+		document.addEventListener('focus', trapFocus, true);
+		document.addEventListener('keydown', onKeyDown, true);
+	}
+
+	function closeDrawer(){
+		document.body.classList.remove('menu-open');
+		drawer.setAttribute('aria-hidden', 'true');
+		openBtn.setAttribute('aria-expanded', 'false');
+		if(backdrop) backdrop.setAttribute('aria-hidden', 'true');
+		unlockScroll();
+		document.removeEventListener('focus', trapFocus, true);
+		document.removeEventListener('keydown', onKeyDown, true);
+		if(lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+	}
+
+	function onKeyDown(e){
+		if(e.key === 'Escape') { closeDrawer(); }
+		if(e.key === 'Tab') { maintainFocus(e); }
+	}
+
+	function trapFocus(e){
+		if(!drawer.contains(e.target) && document.body.classList.contains('menu-open')){
+			e.stopPropagation();
+			drawer.querySelector('button, [href], input, textarea, select')?.focus();
+		}
+	}
+
+	function maintainFocus(e){
+		const focusable = Array.from(drawer.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])')).filter(Boolean);
+		if(!focusable.length) return;
+		const first = focusable[0];
+		const last = focusable[focusable.length - 1];
+		if(e.shiftKey && document.activeElement === first){
+			e.preventDefault(); last.focus();
+		} else if(!e.shiftKey && document.activeElement === last){
+			e.preventDefault(); first.focus();
+		}
+	}
+
+	// open/close handlers
+	openBtn.addEventListener('click', function(){
+		if(document.body.classList.contains('menu-open')) closeDrawer(); else openDrawer();
+	});
+	if(closeBtn) closeBtn.addEventListener('click', closeDrawer);
+	if(backdrop) backdrop.addEventListener('click', closeDrawer);
+
+	// close on resize to larger viewports
+	function syncOnResize(){ if(!isSmallViewport() && document.body.classList.contains('menu-open')) closeDrawer(); }
+	window.addEventListener('resize', syncOnResize);
+	window.addEventListener('orientationchange', syncOnResize);
+
+	// Swipe-to-close on drawer (touch)
+	let startX = null; let startY = null;
+	const threshold = 40; const restraint = 120;
+	drawer.addEventListener('touchstart', function(e){ const t = e.changedTouches[0]; startX = t.pageX; startY = t.pageY; }, {passive:true});
+	drawer.addEventListener('touchend', function(e){ if(startX === null) return; const t = e.changedTouches[0]; const distX = t.pageX - startX; const distY = Math.abs(t.pageY - startY); if(distX > threshold && distY < restraint){ closeDrawer(); } startX = null; startY = null; }, {passive:true});
+
+    // Timer functionality for Central Daylight Time (CDT)
+    function updateTimer() {
+        const timerElement = document.getElementById('timer');
+        if (!timerElement) return;
+
+        // Get the current time in CDT
+        const now = new Date();
+        const options = { timeZone: 'America/Chicago', hour: '2-digit', minute: '2-digit', hour12: true };
+        const timeString = new Intl.DateTimeFormat('en-US', options).format(now);
+
+        // Update the timer element
+        timerElement.textContent = timeString;
+    }
+
+    // Update the timer every second
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    // Weather functionality using NWS API
+    const zipToLatLon = {
+        '77002': { lat: 29.752552016514958, lon: -95.37041452085252 }, // Downtown Houston
+		'77006': { lat: 29.743058828618043, lon: -95.38872535855693 }, // Midtown
+        '77380': { lat: 30.156561330335677, lon: -95.49660348630132 }, // The Woodlands
+        '77373': { lat: 30.060076989444728, lon: -95.38425991103118 }, // Spring
+        '77339': { lat: 30.044222740754748, lon: -95.21623381365497 }, // Kingwood
+        '77024': { lat: 29.785061559286614, lon: -95.55081109649475 }, // Memorial
+        '77493': { lat: 29.86892877253447, lon: -95.83598143772524 }, // Katy
+        '77584': { lat: 29.530560656795313, lon: -95.32129891012985 }, // Pearland
+        '77478': { lat: 29.619364025666467, lon: -95.60777755914671 }, // Sugar Land
+        '77502': { lat: 29.68279320790105, lon: -95.2012332550293 }, // Pasadena
+        '77520': { lat: 29.729931184106412, lon: -94.98634034561468 }, // Baytown
+        '77338': { lat: 29.936252806244546, lon: -95.22575025287787 }, // Humble
+        '77550': { lat: 29.3056910729656, lon: -94.79363293237242 }, // Galveston
+        '77571': { lat: 29.681951027430866, lon: -95.0504713333233 }, // La Porte
+        '77301': { lat: 30.372421017538844, lon: -95.45451089868827 }, // Conroe
+        '77375': { lat: 30.11186355029859, lon: -95.58409952099358 }, // Tomball
+        '77429': { lat: 30.014649608810636, lon: -95.66645508653544 }, // Cypress
+        '77459': { lat: 29.478751988175286, lon: -95.52957848248982 }, // Missouri City
+        '77477': { lat: 29.622026902031646, lon: -95.56770250882548 }, // Stafford
+        '77586': { lat: 29.583383471744852, lon: -95.0348656373267 }, // Seabrook
+        '77573': { lat: 29.495046460629094, lon: -95.09075177952913 }, // League City
+        '77336': { lat: 30.074194329781477, lon: -95.09146031763426 }, // Huffman
+        '77346': { lat: 29.998823130908438, lon: -95.17521190149226 }, // Atascocita
+        '77077': { lat: 29.748046372801, lon: -95.62195225406828 }, // Briarforest
+        '77530': { lat: 29.79477265921269, lon: -95.1119367314215 }  // Channelview
+    };
+
+    async function fetchWeatherNWS(lat, lon) {
+        const url = `https://api.weather.gov/points/${lat},${lon}`;
+        try {
+            // Fetch the forecast URL from the NWS API
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Failed to fetch weather for ${lat},${lon}: ${response.statusText}`);
+            const data = await response.json();
+
+			// Use the hourly forecast URL to get the actual weather data
+			const hourlyForecastUrl = data.properties.forecastHourly;
+			const hourlyResponse = await fetch(hourlyForecastUrl);
+			if (!hourlyResponse.ok) throw new Error(`Failed to fetch hourly forecast: ${hourlyResponse.statusText}`);
+			const hourlyData = await hourlyResponse.json();
+
+			// Get the current hour's temperature and short forecast
+			const now = new Date();
+			const currentHour = hourlyData.properties.periods.find(period => {
+				const startTime = new Date(period.startTime);
+				const endTime = new Date(period.endTime);
+				return now >= startTime && now <= endTime;
+			});
+
+			if (currentHour) {
+				return { temperature: currentHour.temperature, shortForecast: currentHour.shortForecast };
+			} else {
+				throw new Error('No hourly forecast data available for the current time.');
+			}
+        } catch (error) {
+            console.error(`Error fetching weather for ${lat},${lon}:`, error);
+            return null;
+        }
+    }
+
+	async function updateWeather() {
+		for (const [zip, { lat, lon }] of Object.entries(zipToLatLon)) {
+			const result = await fetchWeatherNWS(lat, lon);
+			const weatherElement = document.getElementById(zip);
+			if (weatherElement && result !== null) {
+				const temp = result.temperature;
+				const cond = result.shortForecast || '';
+				weatherElement.textContent = `${temp}°F`;
+				// apply temperature color class
+				applyTempClass(weatherElement, temp);
+				// add icon to the right and color it
+				applyWeatherIcon(weatherElement, cond);
+			}
+		}
+	}
+
+	// helper: pick an icon class from FontAwesome based on NWS shortForecast
+	function pickIconClassForCondition(cond){
+		if(!cond) return 'fa-solid fa-sun';
+		const c = cond.toLowerCase();
+		if(c.includes('thunder') || c.includes('storm') || c.includes('tstm')) return 'fa-solid fa-bolt';
+		if(c.includes('rain') || c.includes('showers')) return 'fa-solid fa-cloud-showers-heavy';
+		if(c.includes('snow') || c.includes('sleet') || c.includes('flurr')) return 'fa-solid fa-snowflake';
+		if(c.includes('tornado')) return 'fa-solid fa-tornado';
+		if(c.includes('hurricane') || c.includes('tropical')) return 'fa-solid fa-hurricane';
+		if(c.includes('cloud') || c.includes('overcast')) return 'fa-solid fa-cloud';
+		if(c.includes('wind') || c.includes('breezy')) return 'fa-solid fa-wind';
+		if(c.includes('sun') || c.includes('clear')) return 'fa-solid fa-sun';
+		// default to sun for miscellaneous Houston-friendly events
+		return 'fa-solid fa-sun';
+	}
+
+	// helper: append or update an icon inside the h2 element, color is inherited via CSS class
+	function applyWeatherIcon(h2el, cond){
+		if(!h2el) return;
+		// remove existing icon if present
+		let icon = h2el.querySelector('i.weather-icon');
+		if(!icon){
+			icon = document.createElement('i');
+			icon.className = 'weather-icon';
+			icon.setAttribute('aria-hidden', 'true');
+			// place to the right using margin-left
+			icon.style.marginLeft = '8px';
+			h2el.appendChild(icon);
+		}
+		const cls = pickIconClassForCondition(cond);
+		icon.className = cls + ' weather-icon';
+		// ensure the icon matches the text color by relying on currentColor
+		icon.style.color = 'currentColor';
+	}
+
+	// helper: apply a temp-based class to the target h2 element
+	function applyTempClass(el, temp){
+		if(!el) return;
+		// remove any existing temp- classes
+		el.classList.remove('temp-90','temp-80','temp-70','temp-60','temp-50','temp-40','temp-30','temp-29');
+		const t = Number(temp);
+		if(Number.isNaN(t)) return;
+		if(t >= 90) el.classList.add('temp-90');
+		else if(t >= 80) el.classList.add('temp-80');
+		else if(t >= 70) el.classList.add('temp-70');
+		else if(t >= 60) el.classList.add('temp-60');
+		else if(t >= 50) el.classList.add('temp-50');
+		else if(t >= 40) el.classList.add('temp-40');
+		else if(t >= 30) el.classList.add('temp-30');
+		else el.classList.add('temp-29');
+	}
+    // Fetch and update weather data
+    updateWeather();
+
+})();
+
+// Client-side posts rendering: fetch from serverless API and populate hero + story cards
+(function(){
+	const HERO_CHAR_LIMIT = 168; // hero paragraph truncate (changed per request)
+	const STORY_CHAR_LIMIT = 140; // story-card paragraph truncate
+
+	function truncate(str, n){
+		if(!str) return '';
+		return str.length > n ? str.slice(0,n).trim().replace(/\s+$/,'') + '…' : str;
+	}
+
+	function timeAgo(iso){
+		if(!iso) return '';
+		const then = new Date(iso);
+		const now = new Date();
+		const diffMs = now - then;
+		const diffMins = Math.floor(diffMs / 60000);
+		if(diffMins < 1) return 'just now';
+		if(diffMins < 60) return `${diffMins}m ago`;
+		const diffHours = Math.floor(diffMins / 60);
+		return `${diffHours}h ago`;
+	}
+
+			// Pagination state
+			let currentPage = 1;
+			const perPage = 6; // 3x2 grid
+			let totalItems = 0;
+
+			function setPager(page, total){
+				totalItems = typeof total === 'number' ? total : 0;
+				const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+				const left = document.querySelector('.page-indexer .arrow.left');
+				const right = document.querySelector('.page-indexer .arrow.right');
+				const pageNum = document.querySelector('.page-indexer .page-number');
+				if(pageNum) pageNum.textContent = `Page ${page}`;
+				if(left) left.disabled = page <= 1;
+				if(right) right.disabled = page >= totalPages;
+			}
+
+			async function loadHero(){
+				try{
+					const r = await fetch('/api/posts?hero=1');
+					if(!r.ok) throw new Error('hero fetch failed');
+					const data = await r.json();
+					const hero = data && data.post ? data.post : null;
+					const heroEl = document.querySelector('.hero');
+					if(!heroEl) return;
+					heroEl.innerHTML = '';
+					if(!hero){ heroEl.textContent = 'No posts available'; return; }
+					const heroImg = document.createElement('img'); heroImg.src = hero.url || ''; heroImg.alt = hero.title || '';
+					const h1 = document.createElement('h1'); h1.textContent = hero.title || '';
+					const p = document.createElement('p'); p.textContent = truncate(hero.body || '', HERO_CHAR_LIMIT);
+					const h4 = document.createElement('h4'); h4.textContent = timeAgo(hero.scrapedAt || null);
+					// wrap hero content in a link to article page using slug
+					const a = document.createElement('a');
+					const slug = (hero.slug || (hero.title || '')).toString().toLowerCase().replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-');
+					a.href = `/articles/${encodeURIComponent(slug)}`;
+					a.setAttribute('aria-label', hero.title || 'Open article');
+					a.appendChild(heroImg);
+					a.appendChild(h1);
+					a.appendChild(p);
+					a.appendChild(h4);
+					heroEl.appendChild(a);
+				}catch(err){ console.error('loadHero error', err); }
+			}
+
+			async function loadPage(page){
+				try{
+					const r = await fetch(`/api/posts?page=${page}&perPage=${perPage}`);
+					if(!r.ok) throw new Error('page fetch failed');
+					const data = await r.json();
+					const posts = data.posts || [];
+					const total = typeof data.total === 'number' ? data.total : 0;
+					const listEl = document.querySelector('.recent-post-tier');
+					if(!listEl) return;
+					listEl.innerHTML = '';
+					// render received posts
+					for(const post of posts){
+						const card = document.createElement('div'); card.className = 'story-card';
+						const img = document.createElement('img'); img.src = post.url || ''; img.alt = post.title || '';
+						const title = document.createElement('h1'); title.textContent = post.title || '';
+						const body = document.createElement('p'); body.textContent = truncate(post.body || '', STORY_CHAR_LIMIT);
+						// make the whole card clickable and navigate to article.html by title
+						const link = document.createElement('a');
+						const slug = (post.slug || (post.title || '')).toString().toLowerCase().replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-');
+						link.href = `/articles/${encodeURIComponent(slug)}`;
+						link.setAttribute('aria-label', post.title || 'Open article');
+						link.appendChild(img);
+						link.appendChild(title);
+						link.appendChild(body);
+						card.appendChild(link);
+						listEl.appendChild(card);
+					}
+					// add placeholders to keep 3x2 grid layout if fewer than perPage
+					const received = posts.length;
+					for(let i=0;i<perPage-received;i++){
+						const ph = document.createElement('div'); ph.className = 'story-card placeholder'; ph.setAttribute('aria-hidden','true');
+						ph.style.visibility = 'hidden'; ph.style.height = '1px'; listEl.appendChild(ph);
+					}
+					setPager(page, total);
+				}catch(err){ console.error('loadPage error', err); }
+			}
+
+			// wire pager controls
+			document.addEventListener('click', function(e){
+				if(e.target.matches('.page-indexer .arrow.left')){
+					if(currentPage>1){ currentPage--; loadPage(currentPage); }
+					return;
+				}
+				if(e.target.matches('.page-indexer .arrow.right')){
+					const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+					if(currentPage < totalPages){ currentPage++; loadPage(currentPage); }
+					return;
+				}
+			});
+
+			async function loadPosts(){
+				await loadHero();
+				await loadPage(currentPage);
+			}
+
+	// Load posts on DOMContentLoaded
+	if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadPosts); else loadPosts();
+})();
+</script>
+</body>
+</html>
